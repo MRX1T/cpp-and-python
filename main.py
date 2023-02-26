@@ -1,7 +1,7 @@
 import csys
 
 
-file = 'test.py'
+file = 'main.py'
 
 
 csys.system('lsd -l')
