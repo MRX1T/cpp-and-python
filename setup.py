@@ -5,11 +5,11 @@ module_name = 'csys'
 
 setup(
     name=module_name,
-    version='0.0.1',
-    description='Python API for calling system functions',
+    version='0.0.2',
+    description='Low-level Python API by wrote on C++',
     author='MRX',
     #author_email='',
-    ext_modules=[Extension('csys', ['csys.cpp'])],
+    ext_modules=[ Extension( 'csys', ['csys.cpp'], include_dirs=['src'] ) ],
     #py_modules=['csys.py']
 )
 
