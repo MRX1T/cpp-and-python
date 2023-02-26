@@ -7,8 +7,7 @@
 
 #define pyobj static PyObject*
 #define pyself PyObject *self
-
-//static PyObject *CSysError;
+#define pyargs PyObject *args
 
 
 namespace fs = std::filesystem;
@@ -38,10 +37,11 @@ rm_all(PyObject *self, PyObject* args);
 
 
 static PyObject *
-make_dir_with_permissions(PyObject *self, PyObject* args);
+std_system(PyObject *self, PyObject* args);
+
 
 static PyObject *
-std_system(PyObject *self, PyObject* args);
+make_dir_with_permissions(PyObject *self, PyObject* args);
 
 
 static PyObject *

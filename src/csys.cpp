@@ -36,7 +36,7 @@ is_exists_c(const char *path) {
 
 
 pyobj
-is_exists(pyself, PyObject* args) {
+is_exists(pyself, pyargs) {
     const char *path;
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
@@ -48,7 +48,7 @@ is_exists(pyself, PyObject* args) {
 
 
 pyobj
-print_str(pyself, PyObject* args) {
+print_str(pyself, pyargs) {
     char *str;
     if (!PyArg_ParseTuple(args, "s", &str)) {
         return NULL;
@@ -59,7 +59,7 @@ print_str(pyself, PyObject* args) {
 
 
 pyobj
-_end_line(pyself, PyObject* args) {
+_end_line(pyself, pyargs) {
     int count;
     if (!PyArg_ParseTuple(args, "i", &count)) {
         return NULL;
@@ -73,7 +73,7 @@ _end_line(pyself, PyObject* args) {
 
 
 pyobj
-rm_all(pyself, PyObject* args) {
+rm_all(pyself, pyargs) {
     const char *path;
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
@@ -84,19 +84,7 @@ rm_all(pyself, PyObject* args) {
 
 
 pyobj
-make_dir_with_permissions(pyself, PyObject* args) {
-    const char *path;
-    const char *permission;
-    if (!PyArg_ParseTuple(args, "ss", &path, &permission)) {
-        return NULL;
-    }
-    mkdir(path, atoi(permission));
-    return Py_None;
-}
-
-
-pyobj
-std_system(pyself, PyObject* args) {
+std_system(pyself, pyargs) {
     const char *to_exec;
     if (!PyArg_ParseTuple(args, "s", &to_exec)) {
         return NULL;
@@ -107,7 +95,19 @@ std_system(pyself, PyObject* args) {
 
 
 pyobj
-make_dir(pyself, PyObject* args) {
+make_dir_with_permissions(pyself, pyargs) {
+    const char *path;
+    int permission;
+    if (!PyArg_ParseTuple(args, "si", &path, &permission)) {
+        return NULL;
+    }
+    mkdir(path, permission);
+    return Py_None;
+}
+
+
+pyobj
+make_dir(pyself, pyargs) {
     const char *path;
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
@@ -118,7 +118,7 @@ make_dir(pyself, PyObject* args) {
 
 
 pyobj
-copy_in_fs_from_to(pyself, PyObject* args) {
+copy_in_fs_from_to(pyself, pyargs) {
     const char *from;
     const char *to;
     if (!PyArg_ParseTuple(args, "ss", &from, &to)) {
@@ -130,7 +130,7 @@ copy_in_fs_from_to(pyself, PyObject* args) {
 
 
 pyobj
-file_size_in_fs(pyself, PyObject* args) {
+file_size_in_fs(pyself, pyargs) {
     const char *path;
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
@@ -141,7 +141,7 @@ file_size_in_fs(pyself, PyObject* args) {
 
 
 pyobj
-get_perms(pyself, PyObject* args) {
+get_perms(pyself, pyargs) {
     const char *path;
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
@@ -162,14 +162,14 @@ get_perms(pyself, PyObject* args) {
 
 static PyMethodDef CSysMethods[] = {
     {"isexists",  (PyCFunction) is_exists, METH_VARARGS, "Return 'True' if dir exist, else False."},
-    {"mkdirwp",  (PyCFunction) make_dir_with_permissions, METH_VARARGS, "Make directory with permissions.\nUsage: mkdir('path', 'linux access codes in the decimal system')"},
+    {"mkdirwp",  (PyCFunction) make_dir_with_permissions, METH_VARARGS, "Make directory with permissions.\nUsage: mkdir('path', int(linux access codes in the decimal system)). rwxrwxrwx = 7sys(777) = deciminal(511) !NEVER USE 551 (777) because this is a huge security risk!"},
     {"mkdir",  (PyCFunction) make_dir, METH_VARARGS, "Make directory."},
     {"system",  (PyCFunction) std_system, METH_VARARGS, "Execute system/shell command."},
     {"remove",  (PyCFunction) rm_all, METH_VARARGS, "Remove file or recursive remove dir."},
     {"copy",  (PyCFunction) copy_in_fs_from_to, METH_VARARGS, "Copy file/dir from ... to ... ."},
     {"filesize",  (PyCFunction) file_size_in_fs, METH_VARARGS, "Get file size in bytes as an integer."},
     {"printstr",  (PyCFunction) print_str, METH_VARARGS, "Print string."},
-    {"endl",  (PyCFunction) _end_line, METH_VARARGS, "Print end of line (line separator ('\\n') )\nUsage: endl(int_count_of_endl)"},
+    {"endl",  (PyCFunction) _end_line, METH_VARARGS, "End of line (line separator ('\\n') )\nUsage: endl(int_count_of_endl)"},
     {"getperms",  (PyCFunction) get_perms, METH_VARARGS, "Get permissions of file/dir"},
     // {"method_name_in_python",  c_method, METH_VARARGS, "Description"},
     {NULL}
