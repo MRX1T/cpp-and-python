@@ -6,6 +6,7 @@ file = 'main.py'
 
 csys.system('lsd -l')
 if csys.isexists(file):
-    print('test.py permissions: ', csys.getperms('dfs'))
+    # csys.__flushostream()
+    print('test.py permissions: {' + csys.getperms('main.py') + '}')
 else:
-    pass
+    print('TEsdfgsdfgsdfgST', 9)

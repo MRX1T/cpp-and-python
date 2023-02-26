@@ -9,7 +9,7 @@ setup(
     description='Low-level Python API by wrote on C++',
     author='MRX',
     #author_email='',
-    ext_modules=[ Extension( 'csys', ['csys.cpp'], include_dirs=['src'] ) ],
+    ext_modules=[ Extension( 'csys', ['src/csys.cpp'], include_dirs=['src'] ) ],
     #py_modules=['csys.py']
 )
 

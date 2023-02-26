@@ -18,10 +18,9 @@ get_permissions_c(fs::perms p)
         result_permissions[6] = (perms::none == (perms::others_read & p) ? '-' : 'r');
         result_permissions[7] = (perms::none == (perms::others_write & p) ? '-' : 'w');
         result_permissions[8] = (perms::none == (perms::others_exec & p) ? '-' : 'x');
-        // std::cout << "{" << result_permissions << "}";
         return result_permissions;  
     }
-    return NULL;
+    throw CSysException("Memory allocation error");
 }
 
 
@@ -42,8 +41,8 @@ is_exists(pyself, pyargs) {
         return NULL;
     }
     if (!is_exists_c(path))
-        return Py_False;
-    return Py_True;
+        return PyLong_FromLong(0);
+    return PyLong_FromLong(1);
 }
 
 
@@ -146,18 +145,19 @@ get_perms(pyself, pyargs) {
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
     }
-    if (!is_exists_c(path)) {
-        PyErr_SetString( PyExc_FileExistsError, "csys: path '' does not exists.");
-        return NULL;
-    }
-    char *perms = get_permissions_c(fs::status(path).permissions());
-    if (perms == NULL) {
-        PyErr_SetString(PyExc_MemoryError, "csys: memory allocation error");
-        return NULL;
-    }
+    const char *perms = get_permissions_c(fs::status(path).permissions());
     return Py_BuildValue("s", perms);
 }
 
+
+pyobj
+__flush_outstream(pyself, pyargs) {
+    if (!PyArg_ParseTuple(args, "")) {
+        return NULL;
+    }
+    flush_outstream();
+    return Py_None;
+}
 
 
 static PyMethodDef CSysMethods[] = {
@@ -171,6 +171,7 @@ static PyMethodDef CSysMethods[] = {
     {"printstr",  (PyCFunction) print_str, METH_VARARGS, "Print string."},
     {"endl",  (PyCFunction) _end_line, METH_VARARGS, "End of line (line separator ('\\n') )\nUsage: endl(int_count_of_endl)"},
     {"getperms",  (PyCFunction) get_perms, METH_VARARGS, "Get permissions of file/dir"},
+    {"__flushostream",  (PyCFunction) __flush_outstream, METH_VARARGS, "NULL"},
     // {"method_name_in_python",  c_method, METH_VARARGS, "Description"},
     {NULL}
 };
@@ -187,5 +188,6 @@ static struct PyModuleDef csys =
 
 PyMODINIT_FUNC PyInit_csys(void)
 {
+    flush_outstream();
     return PyModule_Create(&csys);
 }

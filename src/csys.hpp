@@ -13,11 +13,30 @@
 namespace fs = std::filesystem;
 
 
+class CSysException : public std::exception {
+    private:
+        std::string error;
+    public:
+        CSysException(std::string _error) {
+            error = "CSysException: " + _error;
+        }
+        const char * what () const throw () {
+            return error.c_str();
+        }
+};
+
+
+inline void flush_outstream() { 
+    using std::cout;
+    flush(cout.put(cout.widen('\0'))); 
+}
+
+
 /* BACK METHODS */
 char *
 get_permissions_c(fs::perms p);
 
-static bool
+static bool 
 is_exists_c(const char *path);
 /* BACK METHODS */
 
