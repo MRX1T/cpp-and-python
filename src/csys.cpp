@@ -1,8 +1,52 @@
+/*
+@Copyright 2023 MRX
+
+license: XOSL - X Open Source License ('unknown')
+
+You are granted free permission to work with the Software without restrictions, including not
+limited to, the rights to use, copy, modify, merge, publish, distribute.
+Changed files should be marked.
+The right to apply another license is NOT granted.
+All your developments using this software must also be open source and in the public domain.
+You may not, however, sell copies of this software.
+*/
+
 #include "csys.hpp"
 
 
 
 /* BACK METHODS */
+int
+length(const char *cstr) {
+    int len = 0;
+    while (cstr[len]) { 
+        len++;
+    }
+    return len;
+}
+
+
+char *
+str_join(const char *cstr1, const char *cstr2) {
+    int len1 = length(cstr1), 
+        len2 = length(cstr2),
+        all_len = len1 + len2;
+    char *result_str = (char*) malloc( sizeof(char) * all_len );
+    if (result_str == NULL) {
+        throw CSysException("str_join(): Memory allocation error");
+    }
+    for (int i = 0; i < len1; i++) {
+        *(result_str + i) = *(cstr1 + i);
+    }
+    for (int j = 0; j < len2; j++) {
+        int k = len1;
+        k += j;
+        *(result_str + k) = *(cstr2 + j);
+    }
+    return result_str;
+}
+
+
 char *
 get_permissions_c(fs::perms p)
 {
@@ -20,7 +64,7 @@ get_permissions_c(fs::perms p)
         result_permissions[8] = (perms::none == (perms::others_exec & p) ? '-' : 'x');
         return result_permissions;  
     }
-    throw CSysException("Memory allocation error");
+    throw CSysException("get_permissions_c(): Memory allocation error");
 }
 
 
@@ -52,7 +96,7 @@ print_str(pyself, pyargs) {
     if (!PyArg_ParseTuple(args, "s", &str)) {
         return NULL;
     }
-    std::cout << str;
+    cout << str;
     return Py_None;
 }
 
@@ -145,6 +189,8 @@ get_perms(pyself, pyargs) {
     if (!PyArg_ParseTuple(args, "s", &path)) {
         return NULL;
     }
+    if (!is_exists_c(path))
+        throw CSysException( str_join( str_join("path '", path), "' does not exists" ) );
     const char *perms = get_permissions_c(fs::status(path).permissions());
     return Py_BuildValue("s", perms);
 }
@@ -161,7 +207,7 @@ __flush_outstream(pyself, pyargs) {
 
 
 static PyMethodDef CSysMethods[] = {
-    {"isexists",  (PyCFunction) is_exists, METH_VARARGS, "Return 'True' if dir exist, else False."},
+    {"isexists",  (PyCFunction) is_exists, METH_VARARGS, "Return '1' if dir exist, else 0."},
     {"mkdirwp",  (PyCFunction) make_dir_with_permissions, METH_VARARGS, "Make directory with permissions.\nUsage: mkdir('path', int(linux access codes in the decimal system)). rwxrwxrwx = 7sys(777) = deciminal(511) !NEVER USE 551 (777) because this is a huge security risk!"},
     {"mkdir",  (PyCFunction) make_dir, METH_VARARGS, "Make directory."},
     {"system",  (PyCFunction) std_system, METH_VARARGS, "Execute system/shell command."},
