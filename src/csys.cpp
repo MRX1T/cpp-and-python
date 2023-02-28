@@ -64,6 +64,7 @@ get_permissions_c(fs::perms p)
         result_permissions[8] = (perms::none == (perms::others_exec & p) ? '-' : 'x');
         return result_permissions;  
     }
+    
     throw CSysException("get_permissions_c(): Memory allocation error");
 }
 
@@ -191,7 +192,7 @@ get_perms(pyself, pyargs) {
     }
     if (!is_exists_c(path))
         throw CSysException( str_join( str_join("path '", path), "' does not exists" ) );
-    const char *perms = get_permissions_c(fs::status(path).permissions());
+    const char *perms = get_permissions_c(fs::status(path).permissions());\
     return Py_BuildValue("s", perms);
 }
 
